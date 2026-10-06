@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pipe World Admin</title>
+    <style>
+      :root {
+        --bg: #f3f7fb;
+        --panel: #ffffff;
+        --ink: #172331;
+        --muted: #56677a;
+        --line: #dfe8f0;
+        --blue: #1384d5;
+        --blue-dark: #0868b2;
+        --success: #1d8d5b;
+        --danger: #ad2d2d;
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; min-height: 100%; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); }
+      body { padding: 32px 18px; }
+      .container { max-width: 1160px; margin: 0 auto; }
+      .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 16px 40px rgba(16, 32, 45, 0.06); }
+      .header { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 24px 28px; margin-bottom: 20px; }
+      h1 { margin: 0; font-size: clamp(1.7rem, 2vw, 2.4rem); }
+      .logout { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 10px 16px; cursor: pointer; }
+      .auth-box { max-width: 420px; margin: 80px auto 0; padding: 28px; }
+      .auth-box h2 { margin-top: 0; }
+      .field { display: grid; gap: 8px; margin-bottom: 18px; }
+      .field label { font-weight: 600; }
+      .field input { width: 100%; height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; font-size: 1rem; }
+      .primary { display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 46px; border: 0; border-radius: 10px; background: var(--blue); color: #fff; font-weight: 700; cursor: pointer; }
+      .primary:hover { background: var(--blue-dark); }
+      .status { min-height: 22px; margin-top: 14px; color: var(--danger); font-size: 0.95rem; }
+      .table-wrap { overflow: auto; }
+      table { width: 100%; border-collapse: collapse; min-width: 900px; }
+      th, td { text-align: left; vertical-align: top; padding: 14px 12px; border-bottom: 1px solid var(--line); }
+      th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+      .meta { color: var(--muted); font-size: 0.85rem; }
+      .badge { display: inline-block; padding: 6px 8px; border-radius: 999px; background: rgba(19,132,213,0.1); color: var(--blue); font-size: 0.74rem; font-weight: 700; }
+      .empty { padding: 28px; text-align: center; color: var(--muted); }
+      .storage-status { padding: 14px 20px; margin-bottom: 18px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--muted); }
+      .storage-status.local { border-color: #eacb83; background: #fff9e9; color: #765300; }
+      .storage-status.supabase { border-color: #9bd4b5; background: #eefaf3; color: #17643e; }
+      .hidden { display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <section id="login-panel" class="panel auth-box">
+        <h2>Admin login</h2>
+        <form id="login-form">
+          <div class="field">
+            <label for="username">Username</label>
+            <input id="username" name="username" autocomplete="username" required />
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required />
+          </div>
+          <button class="primary" type="submit">Log in</button>
+          <div id="login-status" class="status" aria-live="polite"></div>
+        </form>
+      </section>
+
+      <section id="dashboard-panel" class="hidden">
+        <div class="panel header">
+          <div>
+            <div class="meta">Pipe World</div>
+            <h1>Enquiry dashboard</h1>
+          </div>
+          <button id="logout-button" class="logout" type="button">Log out</button>
+        </div>
+
+        <div id="storage-status" class="storage-status" role="status"></div>
+
+        <div class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Submitted</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Type</th>
+                  <th>Subject</th>
+                  <th>Message</th>
+                </tr>
+              </thead>
+              <tbody id="inquiry-table-body"></tbody>
+            </table>
+          </div>
+          <div id="empty-state" class="empty hidden">No enquiries yet.</div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const loginPanel = document.querySelector('#login-panel');
+      const dashboardPanel = document.querySelector('#dashboard-panel');
+      const loginForm = document.querySelector('#login-form');
+      const loginStatus = document.querySelector('#login-status');
+      const inquiryTableBody = document.querySelector('#inquiry-table-body');
+      const emptyState = document.querySelector('#empty-state');
+      const storageStatus = document.querySelector('#storage-status');
+
+      const apiUrl = '/api/admin';
+
+      const renderRows = (inquiries) => {
+        inquiryTableBody.innerHTML = '';
+        const rows = Array.isArray(inquiries) ? inquiries : [];
+        emptyState.classList.toggle('hidden', rows.length > 0);
+
+        rows.forEach((item) => {
+          const row = document.createElement('tr');
+          const cells = [
+            new Date(item.created_at || Date.now()).toLocaleString(),
+            item.name || '-',
+            item.email || '-',
+            item.phone || '-',
+            item.type || '-',
+            item.subject || '-',
+            item.message || '-'
+          ];
+          cells.forEach((value, index) => {
+            const cell = document.createElement('td');
+            if (index === 0) cell.className = 'meta';
+            if (index === 4) {
+              const badge = document.createElement('span');
+              badge.className = 'badge';
+              badge.textContent = value;
+              cell.appendChild(badge);
+            } else {
+              cell.textContent = value;
+            }
+            row.appendChild(cell);
+          });
+          inquiryTableBody.appendChild(row);
+        });
+      };
+
+      const renderStorageStatus = (storage) => {
+        const isSupabase = storage === 'supabase';
+        storageStatus.className = `storage-status ${isSupabase ? 'supabase' : 'local'}`;
+        storageStatus.textContent = isSupabase
+          ? 'Storage: Supabase database'
+          : 'Storage: local test file (data/inquiries.json). These entries are not in Supabase.';
+      };
+
+      const setLoggedIn = (loggedIn) => {
+        loginPanel.classList.toggle('hidden', loggedIn);
+        dashboardPanel.classList.toggle('hidden', !loggedIn);
+      };
+
+      const loadDashboard = async () => {
+        try {
+          const response = await fetch(apiUrl, { credentials: 'same-origin' });
+          if (response.status === 401) {
+            setLoggedIn(false);
+            return;
+          }
+          const payload = await response.json();
+          if (!response.ok || !payload.ok) {
+            throw new Error(payload.message || 'Unable to load enquiries.');
+          }
+          setLoggedIn(true);
+          renderRows(payload.inquiries || []);
+          renderStorageStatus(payload.storage);
+        } catch (error) {
+          setLoggedIn(false);
+          loginStatus.textContent = error.message || 'Unable to load enquiries.';
+        }
+      };
+
+      loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData(loginForm);
+        const username = String(formData.get('username') || '').trim();
+        const password = String(formData.get('password') || '').trim();
+
+        loginStatus.textContent = '';
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+          const payload = await response.json();
+          if (!response.ok || !payload.ok) {
+            throw new Error(payload.message || 'Login failed.');
+          }
+
+          loginForm.reset();
+          setLoggedIn(true);
+          renderRows(payload.inquiries || []);
+          renderStorageStatus(payload.storage);
+        } catch (error) {
+          loginStatus.textContent = error.message || 'Login failed.';
+        }
+      });
+
+      document.querySelector('#logout-button').addEventListener('click', async () => {
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'DELETE',
+            credentials: 'same-origin'
+          });
+          if (!response.ok) throw new Error('Unable to log out.');
+          setLoggedIn(false);
+          loginForm.reset();
+          loginStatus.textContent = '';
+        } catch (error) {
+          loginStatus.textContent = error.message || 'Unable to log out.';
+        }
+      });
+
+      loadDashboard();
+    </script>
+  </body>
+</html>
