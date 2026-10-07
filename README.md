@@ -32,37 +32,21 @@ The local development server does not need a Vercel login. Vercel automatically 
 ## Supabase table
 
 1. Open the Supabase dashboard and select the `stzapkoxcdubozphnhuk` project.
-2. Open **SQL Editor**, create a query, paste the SQL below, and select **Run**. Creating a project alone does not create the table.
-
-```sql
-create table if not exists public.inquiries (
-  id text primary key,
-  name text not null,
-  email text not null,
-  phone text,
-  type text not null,
-  subject text,
-  message text not null,
-  created_at timestamptz default now()
-);
-
-alter table public.inquiries enable row level security;
-```
-
-After submitting a test enquiry, check **SQL Editor** with:
-
-```sql
-select id, name, email, created_at
-from public.inquiries
-order by created_at desc
-limit 20;
-```
-
+2. Open **SQL Editor**, create a query, paste the contents of [`supabase/setup.sql`](./supabase/setup.sql), and select **Run**. This is safe to rerun; it adds the enquiry workflow columns and creates the atomic rate-limit function/table. Existing inquiry records are retained.
 3. Open **Project Settings > API Keys** (in some dashboard versions this is under **Project Settings > API**).
    - Copy **Project URL** to `SUPABASE_URL`.
    - Copy the server-side **Secret key** (or legacy `service_role` key) to `SUPABASE_SERVICE_ROLE_KEY`.
    - Do not use the publishable/anon key as the service key. `SUPABASE_ANON_KEY` is optional for this project.
-   - Keep the secret key in `.env` locally and Vercel environment variables in production. Never put it in `index.html` or send it in chat.
+   - Keep the secret key only in `.env` locally and Vercel environment variables in production. Never put it in `index.html` or send it in chat.
+
+Verify new submissions and the workflow columns from **SQL Editor**:
+
+```sql
+select id, name, email, status, admin_notes, created_at, updated_at
+from public.inquiries
+order by created_at desc
+limit 20;
+```
 
 When both `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are configured, submissions are written to the Supabase `inquiries` table. If the service key is blank, local submissions are stored in `data/inquiries.json` instead. The admin dashboard now labels which storage it is displaying.
 
@@ -76,7 +60,19 @@ This uses upsert on the inquiry ID, so rerunning it will not create duplicate co
 
 ## Email delivery
 
-Create an API key in the Resend dashboard under **API Keys** and set it as `RESEND_API_KEY`. Set `FORWARD_EMAIL` to the mailbox that should receive enquiries. For production delivery, verify a sending domain in Resend under **Domains** and use an address from that verified domain for `EMAIL_FROM`; the address can forward replies using `replyTo` without being a separately hosted inbox. Until the API key is configured, enquiries can still be saved to Supabase, but email notifications will not be sent.
+Inquiry notification emails are sent to `FORWARD_EMAIL`; this remains the forwarding inbox configured for quote follow-up. The public website contact address is unchanged. Create an API key in the Resend dashboard under **API Keys** and set it as `RESEND_API_KEY`. For production delivery, verify a sending domain in Resend under **Domains** and use an address from that verified domain for `EMAIL_FROM`; the address can forward replies using `replyTo` without being a separately hosted inbox. Until the API key is configured, enquiries can still be saved to Supabase, but email notifications will not be sent.
+
+## Inquiry abuse protection and admin workflow
+
+- The contact form includes a hidden honeypot field, validates email/type/length server-side and limits each client to **5 enquiries per 15 minutes**.
+- Production rate limits are enforced atomically in Supabase. The address is HMAC-hashed before storage; raw IP addresses are not kept in the rate-limit table.
+- After applying the SQL setup, verify Vercel's `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are configured. If the production rate-limit RPC has not been created, the endpoint returns an error rather than silently accepting unprotected submissions.
+- The inquiry form explains that contact details are used to answer the inquiry and securely retained for follow-up.
+- The admin dashboard supports search, status/type filters, 10/25/50-row pagination, CSV export, and per-inquiry status/internal notes.
+- Workflow statuses: `new`, `in_progress`, `replied`, and `completed`.
+- If inquiries were already present in Supabase when setup is applied, they receive the default status `new`; admin notes start blank.
+
+After changing database schema or functions, redeploy the Vercel project so the API code and Supabase schema are in sync.
 
 ## Admin login
 

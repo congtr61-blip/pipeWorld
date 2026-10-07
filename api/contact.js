@@ -3,7 +3,19 @@ const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 const { Resend } = require('resend');
 
-const dataFilePath = path.join(__dirname, '..', 'data', 'inquiries.json');
+const dataFilePath = process.env.INQUIRIES_FILE || path.join(__dirname, '..', 'data', 'inquiries.json');
+const CONTACT_TYPES = new Set(['general', 'product', 'application', 'cooperation', 'support']);
+const MAX_FIELD_LENGTHS = {
+  name: 120,
+  email: 254,
+  phone: 40,
+  type: 32,
+  subject: 200,
+  message: 4000
+};
+const RATE_LIMIT_COUNT = 5;
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+const localRateLimits = new Map();
 const ensureDataFile = () => {
   const dir = path.dirname(dataFilePath);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -46,12 +58,27 @@ const normalizePayload = (raw) => {
     phone: String(payload.phone || '').trim(),
     type: String(payload.type || '').trim(),
     subject: String(payload.subject || '').trim(),
-    message: String(payload.message || '').trim()
+    message: String(payload.message || '').trim(),
+    website: String(payload.website || '').trim()
   };
 };
 
-const isMissingRequiredField = (payload) => {
-  return !payload.name || !payload.email || !payload.type || !payload.message;
+const validatePayload = (payload) => {
+  if (!payload.name || !payload.email || !payload.type || !payload.message) {
+    return 'Name, email, enquiry type and message are required.';
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+    return 'Enter a valid email address.';
+  }
+  if (!CONTACT_TYPES.has(payload.type)) {
+    return 'Select a valid enquiry type.';
+  }
+  for (const [field, maxLength] of Object.entries(MAX_FIELD_LENGTHS)) {
+    if (payload[field].length > maxLength) {
+      return `${field} must be ${maxLength} characters or fewer.`;
+    }
+  }
+  return '';
 };
 
 const sanitizeText = (value) => String(value || '').replace(/[\r\n]+/g, '\n').slice(0, 2000);
@@ -63,6 +90,65 @@ const escapeHtml = (value) => String(value || '').replace(/[&<>"']/g, (character
   "'": '&#39;'
 })[character]);
 
+const getClientAddress = (req) => {
+  const forwardedAddress = process.env.VERCEL === '1'
+    ? req.headers?.['x-vercel-forwarded-for']
+    : req.headers?.['x-forwarded-for'];
+  const address = Array.isArray(forwardedAddress)
+    ? forwardedAddress[0]
+    : String(forwardedAddress || '').split(',')[0].trim();
+  return address || req.socket?.remoteAddress || 'local-unknown';
+};
+
+const checkRateLimit = async (req) => {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const windowId = Math.floor(Date.now() / RATE_LIMIT_WINDOW_MS);
+
+  if (supabaseUrl && serviceKey) {
+    const addressHash = crypto
+      .createHmac('sha256', serviceKey)
+      .update(getClientAddress(req))
+      .digest('hex');
+    const supabase = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false }
+    });
+    const { data, error } = await supabase.rpc('check_contact_rate_limit', {
+      p_key: addressHash,
+      p_limit: RATE_LIMIT_COUNT,
+      p_window_seconds: RATE_LIMIT_WINDOW_MS / 1000
+    });
+    if (error) {
+      console.error('Contact rate limit error:', error.message);
+      throw new Error('Contact rate limiting is not configured. Apply the Supabase setup SQL.');
+    }
+    const result = Array.isArray(data) ? data[0] : data;
+    if (!result || typeof result.allowed !== 'boolean') {
+      throw new Error('Contact rate limit returned an invalid response.');
+    }
+    return {
+      allowed: result.allowed,
+      retryAfter: Number(result.retry_after_seconds) || RATE_LIMIT_WINDOW_MS / 1000
+    };
+  }
+
+  const now = Date.now();
+  const key = `${getClientAddress(req)}:${windowId}`;
+  const previous = localRateLimits.get(key);
+  const count = previous?.windowId === windowId ? previous.count : 0;
+  if (count >= RATE_LIMIT_COUNT) {
+    return {
+      allowed: false,
+      retryAfter: Math.ceil((windowId * RATE_LIMIT_WINDOW_MS + RATE_LIMIT_WINDOW_MS - now) / 1000)
+    };
+  }
+  localRateLimits.set(key, { windowId, count: count + 1 });
+  for (const [entry, value] of localRateLimits) {
+    if (value.windowId < windowId - 1) localRateLimits.delete(entry);
+  }
+  return { allowed: true, retryAfter: 0 };
+};
+
 const saveInquiry = async (payload) => {
   const inquiry = {
     id: `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`,
@@ -72,6 +158,8 @@ const saveInquiry = async (payload) => {
     type: sanitizeText(payload.type),
     subject: sanitizeText(payload.subject),
     message: sanitizeText(payload.message),
+    status: 'new',
+    admin_notes: '',
     created_at: new Date().toISOString()
   };
 
@@ -147,10 +235,25 @@ module.exports = async function handler(req, res) {
   try {
     const payload = normalizePayload(await parseBody(req));
 
-    if (isMissingRequiredField(payload)) {
-      return res.status(400).json({
+    if (payload.website) {
+      return res.status(200).json({
+        ok: true,
+        message: 'Thank you. Your enquiry has been received.',
+        emailNotificationSent: false
+      });
+    }
+
+    const validationError = validatePayload(payload);
+    if (validationError) {
+      return res.status(400).json({ ok: false, message: validationError });
+    }
+
+    const rateLimit = await checkRateLimit(req);
+    if (!rateLimit.allowed) {
+      res.setHeader('Retry-After', String(rateLimit.retryAfter));
+      return res.status(429).json({
         ok: false,
-        message: 'Name, email, enquiry type and message are required.'
+        message: 'Too many enquiries from this connection. Please try again later.'
       });
     }
 

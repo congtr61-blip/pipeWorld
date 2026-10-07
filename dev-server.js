@@ -55,10 +55,16 @@ const handleApiRequest = async (req, res, body) => {
     json(payload) {
       sendJson(res, this.statusCode, payload);
       return this;
+    },
+    send(payload) {
+      res.writeHead(this.statusCode);
+      res.end(payload);
+      return this;
     }
   };
   const apiRequest = {
     method: req.method,
+    url: req.url,
     headers: req.headers,
     body
   };
@@ -109,7 +115,7 @@ const serveStaticFile = (req, res) => {
   });
 };
 
-loadLocalEnvironment();
+if (process.env.SKIP_LOCAL_ENV !== '1') loadLocalEnvironment();
 
 http.createServer(async (req, res) => {
   const pathname = new URL(req.url, 'http://localhost').pathname;

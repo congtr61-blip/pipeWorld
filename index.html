@@ -1110,6 +1110,15 @@
         justify-self: start;
       }
 
+      .website-field {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+      }
+
       .form-note,
       .form-status {
         grid-column: 1 / -1;
@@ -1898,7 +1907,11 @@
                 <span>How can we help? *</span>
                 <textarea name="message" id="inquiry-message" required></textarea>
               </label>
-              <p class="form-note">Your enquiry will be submitted securely and stored for the Pipe World team to review.</p>
+              <label class="website-field" aria-hidden="true">
+                Leave this field empty
+                <input name="website" tabindex="-1" autocomplete="off" />
+              </label>
+              <p class="form-note">We use your details only to respond to this enquiry and provide requested information. Your enquiry is stored securely for our team to follow up.</p>
               <button class="button inquiry-submit form-field-wide" type="submit">Send enquiry <span aria-hidden="true">↗</span></button>
               <p class="form-status" id="inquiry-status" role="status" aria-live="polite" hidden></p>
             </form>
@@ -2104,6 +2117,8 @@
           "请告诉我们您的需求。我们会审核询价并尽快提供相关信息。",
         "Your enquiry will be submitted securely and stored for the Pipe World team to review.":
           "您的询价将安全提交并保存，供 Pipe World 团队跟进。",
+        "We use your details only to respond to this enquiry and provide requested information. Your enquiry is stored securely for our team to follow up.":
+          "我们仅使用您提供的信息回复本次咨询并提供所需资料。询价信息将安全保存，供团队跟进。",
         "Your enquiry was saved, but the email notification could not be sent. Please email us directly if your request is urgent.":
           "您的询价已保存，但邮件通知未能发送。如有紧急需求，请直接发送邮件联系我们。",
         "Or email us directly": "或直接发送邮件",
@@ -2120,6 +2135,8 @@
         "How can we help? *": "请描述您的需求 *",
         "Your enquiry will be submitted securely and stored for the Pipe World team to review.":
           "您的询价将安全提交并保存，供 Pipe World 团队跟进。",
+        "We use your details only to respond to this enquiry and provide requested information. Your enquiry is stored securely for our team to follow up.":
+          "我们仅使用您提供的信息回复本次咨询并提供所需资料。询价信息将安全保存，供团队跟进。",
         "View Civil Building Pipeline details": "查看民用建筑管道详情",
         "View Municipal Engineering Pipelines details": "查看市政工程管道详情",
         "View Home Decoration Piping details": "查看家装管道详情",
@@ -2628,7 +2645,8 @@
           phone: String(values.get("phone") || "").trim(),
           type: String(values.get("type") || "").trim(),
           subject: String(values.get("subject") || "").trim(),
-          message: String(values.get("message") || "").trim()
+          message: String(values.get("message") || "").trim(),
+          website: String(values.get("website") || "").trim()
         };
 
         const response = await fetch('/api/contact', {
@@ -2639,6 +2657,11 @@
 
         const result = await response.json();
         if (!response.ok || !result.ok) {
+          if (response.status === 429) {
+            throw new Error(currentLanguage() === "zh"
+              ? "提交过于频繁，请稍后再试。"
+              : "Too many submissions. Please try again later.");
+          }
           throw new Error(result.message || 'Submission failed.');
         }
 

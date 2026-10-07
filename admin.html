@@ -13,37 +13,77 @@
         --line: #dfe8f0;
         --blue: #1384d5;
         --blue-dark: #0868b2;
-        --success: #1d8d5b;
         --danger: #ad2d2d;
       }
 
       * { box-sizing: border-box; }
-      html, body { margin: 0; padding: 0; min-height: 100%; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); }
+      html, body { margin: 0; min-height: 100%; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); }
       body { padding: 32px 18px; }
-      .container { max-width: 1160px; margin: 0 auto; }
+      .container { max-width: 1280px; margin: 0 auto; }
       .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 16px 40px rgba(16, 32, 45, 0.06); }
       .header { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 24px 28px; margin-bottom: 20px; }
       h1 { margin: 0; font-size: clamp(1.7rem, 2vw, 2.4rem); }
-      .logout { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 10px 16px; cursor: pointer; }
+      .header-actions, .toolbar-actions { display: flex; align-items: center; gap: 10px; }
+      .control-button, .logout { min-height: 40px; padding: 9px 14px; border: 1px solid var(--line); background: #fff; border-radius: 9px; color: var(--ink); font-weight: 700; cursor: pointer; }
+      .control-button:hover, .logout:hover { border-color: var(--blue); color: var(--blue-dark); }
+      .control-button.primary { border-color: var(--blue); background: var(--blue); color: #fff; }
       .auth-box { max-width: 420px; margin: 80px auto 0; padding: 28px; }
       .auth-box h2 { margin-top: 0; }
       .field { display: grid; gap: 8px; margin-bottom: 18px; }
       .field label { font-weight: 600; }
-      .field input { width: 100%; height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; font-size: 1rem; }
+      .field input, .filters input, .filters select, .row-status, .row-notes {
+        min-height: 40px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        padding: 8px 10px;
+        color: var(--ink);
+        font: inherit;
+      }
+      .field input { width: 100%; height: 44px; padding: 0 12px; font-size: 1rem; }
       .primary { display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 46px; border: 0; border-radius: 10px; background: var(--blue); color: #fff; font-weight: 700; cursor: pointer; }
       .primary:hover { background: var(--blue-dark); }
       .status { min-height: 22px; margin-top: 14px; color: var(--danger); font-size: 0.95rem; }
-      .table-wrap { overflow: auto; }
-      table { width: 100%; border-collapse: collapse; min-width: 900px; }
-      th, td { text-align: left; vertical-align: top; padding: 14px 12px; border-bottom: 1px solid var(--line); }
-      th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
-      .meta { color: var(--muted); font-size: 0.85rem; }
-      .badge { display: inline-block; padding: 6px 8px; border-radius: 999px; background: rgba(19,132,213,0.1); color: var(--blue); font-size: 0.74rem; font-weight: 700; }
-      .empty { padding: 28px; text-align: center; color: var(--muted); }
       .storage-status { padding: 14px 20px; margin-bottom: 18px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--muted); }
       .storage-status.local { border-color: #eacb83; background: #fff9e9; color: #765300; }
       .storage-status.supabase { border-color: #9bd4b5; background: #eefaf3; color: #17643e; }
+      .filters { display: grid; grid-template-columns: minmax(180px, 1fr) 170px 190px 130px auto; align-items: end; gap: 12px; padding: 18px; margin-bottom: 16px; }
+      .filters .field { min-width: 0; margin: 0; }
+      .filters label { color: var(--muted); font-size: 0.83rem; font-weight: 700; }
+      .filters input, .filters select { width: 100%; }
+      .filters form { display: contents; }
+      .summary { display: flex; justify-content: space-between; gap: 16px; align-items: center; color: var(--muted); font-size: 0.9rem; }
+      .results-bar { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 0 4px 14px; }
+      .table-wrap { overflow: auto; }
+      table { width: 100%; border-collapse: collapse; min-width: 1020px; }
+      th, td { text-align: left; vertical-align: top; padding: 13px 12px; border-bottom: 1px solid var(--line); }
+      th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+      td { font-size: 0.9rem; line-height: 1.5; }
+      .contact-name { font-weight: 700; }
+      .contact-details, .meta { color: var(--muted); font-size: 0.82rem; overflow-wrap: anywhere; }
+      .message-cell { min-width: 200px; max-width: 310px; white-space: pre-wrap; overflow-wrap: anywhere; }
+      .row-status { min-width: 135px; }
+      .row-notes { display: block; width: 220px; min-height: 74px; resize: vertical; }
+      .save-row { margin-top: 8px; padding: 7px 10px; border: 0; border-radius: 7px; background: var(--blue); color: #fff; font-weight: 700; cursor: pointer; }
+      .save-row:disabled { opacity: 0.6; cursor: wait; }
+      .row-status-message { display: block; min-height: 18px; margin-top: 4px; color: var(--muted); font-size: 0.75rem; }
+      .empty { padding: 28px; text-align: center; color: var(--muted); }
+      .pagination { display: flex; justify-content: center; align-items: center; gap: 14px; padding: 18px; }
+      .pagination button:disabled { opacity: 0.45; cursor: not-allowed; }
       .hidden { display: none; }
+
+      @media (max-width: 900px) {
+        .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .filters .toolbar-actions { grid-column: 1 / -1; }
+      }
+      @media (max-width: 560px) {
+        body { padding: 16px 10px; }
+        .header { align-items: flex-start; padding: 18px; }
+        .header-actions { flex-direction: column; align-items: stretch; }
+        .filters { grid-template-columns: 1fr; }
+        .filters .toolbar-actions { grid-column: auto; }
+        .results-bar { align-items: flex-start; flex-direction: column; }
+      }
     </style>
   </head>
   <body>
@@ -70,30 +110,82 @@
             <div class="meta">Pipe World</div>
             <h1>Enquiry dashboard</h1>
           </div>
-          <button id="logout-button" class="logout" type="button">Log out</button>
+          <div class="header-actions">
+            <button id="refresh-button" class="control-button" type="button">Refresh</button>
+            <button id="logout-button" class="logout" type="button">Log out</button>
+          </div>
         </div>
 
         <div id="storage-status" class="storage-status" role="status"></div>
 
-        <div class="panel">
+        <section class="panel filters" aria-label="Filter enquiries">
+          <form id="filter-form">
+            <div class="field">
+              <label for="search-filter">Search name, email, subject or message</label>
+              <input id="search-filter" name="search" type="search" maxlength="100" />
+            </div>
+          </form>
+          <div class="field">
+            <label for="status-filter">Status</label>
+            <select id="status-filter">
+              <option value="">All statuses</option>
+              <option value="new">New</option>
+              <option value="in_progress">In progress</option>
+              <option value="replied">Replied</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="type-filter">Enquiry type</label>
+            <select id="type-filter">
+              <option value="">All types</option>
+              <option value="general">General</option>
+              <option value="product">Product</option>
+              <option value="application">Application</option>
+              <option value="cooperation">Cooperation</option>
+              <option value="support">Technical support</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="page-size">Rows per page</label>
+            <select id="page-size">
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+          <div class="toolbar-actions">
+            <button id="export-button" class="control-button primary" type="button">Export CSV</button>
+          </div>
+        </section>
+
+        <div class="results-bar">
+          <div id="results-summary" class="summary" aria-live="polite"></div>
+          <div id="dashboard-status" class="status" aria-live="polite"></div>
+        </div>
+
+        <section class="panel">
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
                   <th>Submitted</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Type</th>
-                  <th>Subject</th>
-                  <th>Message</th>
+                  <th>Contact</th>
+                  <th>Enquiry</th>
+                  <th>Status</th>
+                  <th>Internal notes</th>
                 </tr>
               </thead>
               <tbody id="inquiry-table-body"></tbody>
             </table>
           </div>
-          <div id="empty-state" class="empty hidden">No enquiries yet.</div>
-        </div>
+          <div id="empty-state" class="empty hidden">No enquiries match these filters.</div>
+          <nav class="pagination" aria-label="Inquiry pages">
+            <button id="previous-page" class="control-button" type="button">Previous</button>
+            <span id="page-summary" class="summary"></span>
+            <button id="next-page" class="control-button" type="button">Next</button>
+          </nav>
+        </section>
       </section>
     </div>
 
@@ -102,43 +194,25 @@
       const dashboardPanel = document.querySelector('#dashboard-panel');
       const loginForm = document.querySelector('#login-form');
       const loginStatus = document.querySelector('#login-status');
+      const dashboardStatus = document.querySelector('#dashboard-status');
       const inquiryTableBody = document.querySelector('#inquiry-table-body');
       const emptyState = document.querySelector('#empty-state');
       const storageStatus = document.querySelector('#storage-status');
-
+      const resultsSummary = document.querySelector('#results-summary');
+      const pageSummary = document.querySelector('#page-summary');
+      const searchFilter = document.querySelector('#search-filter');
+      const statusFilter = document.querySelector('#status-filter');
+      const typeFilter = document.querySelector('#type-filter');
+      const pageSizeSelect = document.querySelector('#page-size');
+      const previousPageButton = document.querySelector('#previous-page');
+      const nextPageButton = document.querySelector('#next-page');
       const apiUrl = '/api/admin';
+      let currentPage = 1;
+      let totalPages = 1;
 
-      const renderRows = (inquiries) => {
-        inquiryTableBody.innerHTML = '';
-        const rows = Array.isArray(inquiries) ? inquiries : [];
-        emptyState.classList.toggle('hidden', rows.length > 0);
-
-        rows.forEach((item) => {
-          const row = document.createElement('tr');
-          const cells = [
-            new Date(item.created_at || Date.now()).toLocaleString(),
-            item.name || '-',
-            item.email || '-',
-            item.phone || '-',
-            item.type || '-',
-            item.subject || '-',
-            item.message || '-'
-          ];
-          cells.forEach((value, index) => {
-            const cell = document.createElement('td');
-            if (index === 0) cell.className = 'meta';
-            if (index === 4) {
-              const badge = document.createElement('span');
-              badge.className = 'badge';
-              badge.textContent = value;
-              cell.appendChild(badge);
-            } else {
-              cell.textContent = value;
-            }
-            row.appendChild(cell);
-          });
-          inquiryTableBody.appendChild(row);
-        });
+      const setLoggedIn = (loggedIn) => {
+        loginPanel.classList.toggle('hidden', loggedIn);
+        dashboardPanel.classList.toggle('hidden', !loggedIn);
       };
 
       const renderStorageStatus = (storage) => {
@@ -149,28 +223,184 @@
           : 'Storage: local test file (data/inquiries.json). These entries are not in Supabase.';
       };
 
-      const setLoggedIn = (loggedIn) => {
-        loginPanel.classList.toggle('hidden', loggedIn);
-        dashboardPanel.classList.toggle('hidden', !loggedIn);
+      const makeCell = (text, className = '') => {
+        const cell = document.createElement('td');
+        cell.textContent = text || '-';
+        if (className) cell.className = className;
+        return cell;
       };
 
-      const loadDashboard = async () => {
+      const renderRows = (inquiries) => {
+        inquiryTableBody.replaceChildren();
+        const rows = Array.isArray(inquiries) ? inquiries : [];
+        emptyState.classList.toggle('hidden', rows.length > 0);
+
+        rows.forEach((item) => {
+          const row = document.createElement('tr');
+          row.dataset.inquiryId = item.id;
+
+          const submitted = makeCell(new Date(item.created_at || Date.now()).toLocaleString(), 'meta');
+          row.appendChild(submitted);
+
+          const contact = document.createElement('td');
+          const name = document.createElement('div');
+          name.className = 'contact-name';
+          name.textContent = item.name || '-';
+          const email = document.createElement('a');
+          email.className = 'contact-details';
+          email.href = `mailto:${item.email || ''}`;
+          email.textContent = item.email || '-';
+          const phone = document.createElement('div');
+          phone.className = 'contact-details';
+          phone.textContent = item.phone || '';
+          contact.append(name, email, phone);
+          row.appendChild(contact);
+
+          const enquiry = document.createElement('td');
+          const type = document.createElement('strong');
+          type.textContent = item.type || 'general';
+          const subject = document.createElement('div');
+          subject.className = 'meta';
+          subject.textContent = item.subject || '';
+          const message = document.createElement('div');
+          message.className = 'message-cell';
+          message.textContent = item.message || '';
+          enquiry.append(type, subject, message);
+          row.appendChild(enquiry);
+
+          const statusCell = document.createElement('td');
+          const statusSelect = document.createElement('select');
+          statusSelect.className = 'row-status';
+          statusSelect.setAttribute('aria-label', `Status for ${item.name || 'enquiry'}`);
+          [
+            ['new', 'New'],
+            ['in_progress', 'In progress'],
+            ['replied', 'Replied'],
+            ['completed', 'Completed']
+          ].forEach(([value, label]) => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = label;
+            statusSelect.appendChild(option);
+          });
+          statusSelect.value = item.status || 'new';
+          statusCell.appendChild(statusSelect);
+          row.appendChild(statusCell);
+
+          const notesCell = document.createElement('td');
+          const notes = document.createElement('textarea');
+          notes.className = 'row-notes';
+          notes.maxLength = 4000;
+          notes.placeholder = 'Internal notes for follow-up';
+          notes.setAttribute('aria-label', `Internal notes for ${item.name || 'enquiry'}`);
+          notes.value = item.admin_notes || '';
+          const saveButton = document.createElement('button');
+          saveButton.className = 'save-row';
+          saveButton.type = 'button';
+          saveButton.dataset.action = 'save';
+          saveButton.textContent = 'Save';
+          const saveStatus = document.createElement('span');
+          saveStatus.className = 'row-status-message';
+          saveStatus.setAttribute('aria-live', 'polite');
+          notesCell.append(notes, saveButton, saveStatus);
+          row.appendChild(notesCell);
+
+          inquiryTableBody.appendChild(row);
+        });
+      };
+
+      const buildFilters = (includePage = true) => {
+        const params = new URLSearchParams();
+        const search = searchFilter.value.trim();
+        if (search) params.set('search', search);
+        if (statusFilter.value) params.set('status', statusFilter.value);
+        if (typeFilter.value) params.set('type', typeFilter.value);
+        if (includePage) {
+          params.set('page', String(currentPage));
+          params.set('pageSize', pageSizeSelect.value);
+        }
+        return params;
+      };
+
+      const loadInquiries = async () => {
+        dashboardStatus.textContent = 'Loading enquiries...';
+        const response = await fetch(`${apiUrl}?${buildFilters().toString()}`, {
+          credentials: 'same-origin'
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) {
+          if (response.status === 401) setLoggedIn(false);
+          throw new Error(payload.message || 'Unable to load enquiries.');
+        }
+
+        renderStorageStatus(payload.storage);
+        renderRows(payload.inquiries);
+        totalPages = Math.max(1, Math.ceil(payload.total / payload.pageSize));
+        resultsSummary.textContent = `${payload.total} ${payload.total === 1 ? 'enquiry' : 'enquiries'} found`;
+        pageSummary.textContent = `Page ${payload.page} of ${totalPages}`;
+        previousPageButton.disabled = payload.page <= 1;
+        nextPageButton.disabled = payload.page >= totalPages;
+        dashboardStatus.textContent = '';
+      };
+
+      const checkExistingSession = async () => {
         try {
-          const response = await fetch(apiUrl, { credentials: 'same-origin' });
-          if (response.status === 401) {
-            setLoggedIn(false);
-            return;
+          await loadInquiries();
+        } catch (error) {
+          if (error.message !== 'Authentication required.') {
+            dashboardStatus.textContent = error.message || 'Unable to load enquiries.';
           }
+        }
+      };
+
+      const refreshInquiries = async () => {
+        try {
+          await loadInquiries();
+        } catch (error) {
+          dashboardStatus.textContent = error.message || 'Unable to load enquiries.';
+        }
+      };
+
+      const authenticate = async (username, password) => {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) {
+          throw new Error(payload.message || 'Login failed.');
+        }
+        setLoggedIn(true);
+        await loadInquiries();
+      };
+
+      const saveInquiry = async (row) => {
+        const saveButton = row.querySelector('[data-action="save"]');
+        const status = row.querySelector('.row-status-message');
+        saveButton.disabled = true;
+        status.textContent = 'Saving...';
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'PATCH',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: row.dataset.inquiryId,
+              status: row.querySelector('.row-status').value,
+              admin_notes: row.querySelector('.row-notes').value.trim()
+            })
+          });
           const payload = await response.json();
           if (!response.ok || !payload.ok) {
-            throw new Error(payload.message || 'Unable to load enquiries.');
+            throw new Error(payload.message || 'Unable to save enquiry.');
           }
-          setLoggedIn(true);
-          renderRows(payload.inquiries || []);
-          renderStorageStatus(payload.storage);
+          status.textContent = 'Saved';
         } catch (error) {
-          setLoggedIn(false);
-          loginStatus.textContent = error.message || 'Unable to load enquiries.';
+          status.textContent = error.message || 'Unable to save enquiry.';
+        } finally {
+          saveButton.disabled = false;
         }
       };
 
@@ -179,26 +409,66 @@
         const formData = new FormData(loginForm);
         const username = String(formData.get('username') || '').trim();
         const password = String(formData.get('password') || '').trim();
-
         loginStatus.textContent = '';
         try {
-          const response = await fetch(apiUrl, {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-          });
-          const payload = await response.json();
-          if (!response.ok || !payload.ok) {
-            throw new Error(payload.message || 'Login failed.');
-          }
-
+          await authenticate(username, password);
           loginForm.reset();
-          setLoggedIn(true);
-          renderRows(payload.inquiries || []);
-          renderStorageStatus(payload.storage);
         } catch (error) {
           loginStatus.textContent = error.message || 'Login failed.';
+        }
+      });
+
+      document.querySelector('#filter-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        currentPage = 1;
+        checkExistingSession();
+      });
+      [statusFilter, typeFilter, pageSizeSelect].forEach((control) => {
+        control.addEventListener('change', () => {
+          currentPage = 1;
+          refreshInquiries();
+        });
+      });
+      previousPageButton.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage -= 1;
+          refreshInquiries();
+        }
+      });
+      nextPageButton.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+          currentPage += 1;
+          refreshInquiries();
+        }
+      });
+      document.querySelector('#refresh-button').addEventListener('click', refreshInquiries);
+      inquiryTableBody.addEventListener('click', (event) => {
+        const saveButton = event.target.closest('[data-action="save"]');
+        if (saveButton) saveInquiry(saveButton.closest('tr'));
+      });
+
+      document.querySelector('#export-button').addEventListener('click', async () => {
+        dashboardStatus.textContent = 'Preparing CSV...';
+        try {
+          const params = buildFilters(false);
+          params.set('export', 'csv');
+          const response = await fetch(`${apiUrl}?${params.toString()}`, {
+            credentials: 'same-origin'
+          });
+          if (!response.ok) {
+            const payload = await response.json();
+            throw new Error(payload.message || 'Unable to export enquiries.');
+          }
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'pipe-world-enquiries.csv';
+          link.click();
+          URL.revokeObjectURL(url);
+          dashboardStatus.textContent = 'CSV exported.';
+        } catch (error) {
+          dashboardStatus.textContent = error.message || 'Unable to export enquiries.';
         }
       });
 
@@ -213,11 +483,11 @@
           loginForm.reset();
           loginStatus.textContent = '';
         } catch (error) {
-          loginStatus.textContent = error.message || 'Unable to log out.';
+          dashboardStatus.textContent = error.message || 'Unable to log out.';
         }
       });
 
-      loadDashboard();
+      refreshInquiries();
     </script>
   </body>
 </html>
