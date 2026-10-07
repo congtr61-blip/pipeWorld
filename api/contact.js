@@ -1,3 +1,4 @@
+const { createHmac } = require('node:crypto');
 const fs = require('fs');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
@@ -106,8 +107,7 @@ const checkRateLimit = async (req) => {
   const windowId = Math.floor(Date.now() / RATE_LIMIT_WINDOW_MS);
 
   if (supabaseUrl && serviceKey) {
-    const addressHash = crypto
-      .createHmac('sha256', serviceKey)
+    const addressHash = createHmac('sha256', serviceKey)
       .update(getClientAddress(req))
       .digest('hex');
     const supabase = createClient(supabaseUrl, serviceKey, {
