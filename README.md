@@ -3,7 +3,7 @@
 This project includes:
 - the static homepage in `index.html`
 - a real inquiry API at `/api/contact`
-- an admin dashboard at `/admin.html`
+- an admin dashboard at `/admin.html` for enquiries and bilingual cooperation cases
 - local fallback storage for submissions when Supabase is not configured
 
 ## Local setup
@@ -73,6 +73,14 @@ Inquiry notification emails are sent to `FORWARD_EMAIL`; this remains the forwar
 - If inquiries were already present in Supabase when setup is applied, they receive the default status `new`; admin notes start blank.
 
 After changing database schema or functions, redeploy the Vercel project so the API code and Supabase schema are in sync.
+
+## Social link and cooperation cases
+
+- The public Facebook link points to `https://www.facebook.com/profile.php?id=61595181328626` in the desktop contact strip and footer. WhatsApp has intentionally not been added until a business number is provided.
+- Run [`supabase/cases.sql`](./supabase/cases.sql) in the same Supabase SQL Editor. It creates the case table and a public-read image bucket; case records themselves remain private to the server API.
+- The admin dashboard has an **Enquiries / Cooperation cases** switch. The case editor uses basic English/Chinese text fields, a single optional JPG/PNG/WebP cover (up to 2.5 MB), and a draft/publish selector. No HTML or rich-text formatting is required.
+- Published cases appear in the homepage **Cooperation cases** section between Applications and Plant & Equipment. Drafts remain visible only in the admin dashboard.
+- Case creation and updates require a Supabase service-role key and the `project_cases` table plus `pipeworld-cases` storage bucket. Apply the SQL before deploying the new API.
 
 ## Admin login
 

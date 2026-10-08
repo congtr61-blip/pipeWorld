@@ -70,6 +70,26 @@
       .empty { padding: 28px; text-align: center; color: var(--muted); }
       .pagination { display: flex; justify-content: center; align-items: center; gap: 14px; padding: 18px; }
       .pagination button:disabled { opacity: 0.45; cursor: not-allowed; }
+      .dashboard-tabs { display: flex; gap: 8px; margin: 0 0 18px; }
+      .tab-button { min-height: 42px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 9px; background: #fff; color: var(--ink); font-weight: 700; cursor: pointer; }
+      .tab-button[aria-selected="true"] { border-color: var(--blue); background: var(--blue); color: #fff; }
+      .case-manager { display: grid; grid-template-columns: minmax(290px, 0.8fr) minmax(0, 1.2fr); gap: 18px; align-items: start; }
+      .case-editor, .case-list { padding: 22px; }
+      .case-editor h2, .case-list h2 { margin-top: 0; }
+      .case-editor-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .case-editor-grid .field { margin: 0; }
+      .case-editor-grid .wide { grid-column: 1 / -1; }
+      .case-editor textarea { min-height: 90px; resize: vertical; }
+      .case-editor input[type="file"] { height: auto; padding: 8px; }
+      .case-editor small, .case-list small { color: var(--muted); line-height: 1.5; }
+      .case-editor-actions { display: flex; gap: 8px; margin-top: 16px; }
+      .case-editor-actions button { width: auto; padding-inline: 18px; }
+      .case-editor-status { min-height: 22px; margin-top: 10px; color: var(--muted); }
+      .admin-case-row { display: flex; justify-content: space-between; gap: 14px; align-items: center; padding: 13px 0; border-top: 1px solid var(--line); }
+      .admin-case-row strong { display: block; }
+      .admin-case-actions { display: flex; flex: 0 0 auto; gap: 7px; }
+      .admin-case-actions button { padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; background: #fff; cursor: pointer; }
+      .case-cover-preview { display: block; max-width: 100%; max-height: 180px; margin-top: 10px; object-fit: cover; border-radius: 8px; }
       .hidden { display: none; }
 
       @media (max-width: 900px) {
@@ -83,6 +103,9 @@
         .filters { grid-template-columns: 1fr; }
         .filters .toolbar-actions { grid-column: auto; }
         .results-bar { align-items: flex-start; flex-direction: column; }
+        .case-manager { grid-template-columns: 1fr; }
+        .case-editor-grid { grid-template-columns: 1fr; }
+        .case-editor-grid .wide { grid-column: auto; }
       }
     </style>
   </head>
@@ -118,6 +141,12 @@
 
         <div id="storage-status" class="storage-status" role="status"></div>
 
+        <nav class="dashboard-tabs" aria-label="Admin sections">
+          <button class="tab-button" type="button" data-view="inquiries-view" aria-selected="true">Enquiries</button>
+          <button class="tab-button" type="button" data-view="cases-view" aria-selected="false">Cooperation cases</button>
+        </nav>
+
+        <div id="inquiries-view">
         <section class="panel filters" aria-label="Filter enquiries">
           <form id="filter-form">
             <div class="field">
@@ -186,6 +215,84 @@
             <button id="next-page" class="control-button" type="button">Next</button>
           </nav>
         </section>
+        </div>
+
+        <section id="cases-view" class="hidden">
+          <div class="case-manager">
+            <form id="case-form" class="panel case-editor">
+              <h2 id="case-form-title">Add a case</h2>
+              <input type="hidden" name="id" />
+
+              <div class="case-editor-grid">
+                <div class="field">
+                  <label for="case-title-en">Title (English)</label>
+                  <input id="case-title-en" name="title_en" maxlength="120" required />
+                </div>
+                <div class="field">
+                  <label for="case-title-zh">Title (Chinese)</label>
+                  <input id="case-title-zh" name="title_zh" maxlength="120" required />
+                </div>
+                <div class="field">
+                  <label for="case-location-en">Location (English)</label>
+                  <input id="case-location-en" name="location_en" maxlength="120" required />
+                </div>
+                <div class="field">
+                  <label for="case-location-zh">Location (Chinese)</label>
+                  <input id="case-location-zh" name="location_zh" maxlength="120" required />
+                </div>
+                <div class="field">
+                  <label for="case-category-en">Project type (English)</label>
+                  <input id="case-category-en" name="category_en" maxlength="80" placeholder="Municipal water supply" required />
+                </div>
+                <div class="field">
+                  <label for="case-category-zh">Project type (Chinese)</label>
+                  <input id="case-category-zh" name="category_zh" maxlength="80" placeholder="市政供水" required />
+                </div>
+                <div class="field wide">
+                  <label for="case-summary-en">Short introduction (English)</label>
+                  <textarea id="case-summary-en" name="summary_en" maxlength="280" required></textarea>
+                  <small>Shown on the homepage card. Keep it to one or two short sentences.</small>
+                </div>
+                <div class="field wide">
+                  <label for="case-summary-zh">Short introduction (Chinese)</label>
+                  <textarea id="case-summary-zh" name="summary_zh" maxlength="280" required></textarea>
+                </div>
+                <div class="field wide">
+                  <label for="case-details-en">Case details (English)</label>
+                  <textarea id="case-details-en" name="details_en" maxlength="4000" required></textarea>
+                </div>
+                <div class="field wide">
+                  <label for="case-details-zh">Case details (Chinese)</label>
+                  <textarea id="case-details-zh" name="details_zh" maxlength="4000" required></textarea>
+                </div>
+                <div class="field wide">
+                  <label for="case-cover">Cover image</label>
+                  <input id="case-cover" name="cover_image" type="file" accept="image/jpeg,image/png,image/webp" />
+                  <small>Optional JPG, PNG or WebP, up to 2.5 MB. A single cover keeps publishing simple.</small>
+                  <img id="case-cover-preview" class="case-cover-preview hidden" alt="Case cover preview" />
+                </div>
+                <div class="field wide">
+                  <label for="case-status">Publishing</label>
+                  <select id="case-status" name="status" required>
+                    <option value="draft">Save as draft</option>
+                    <option value="published">Publish on homepage</option>
+                  </select>
+                </div>
+              </div>
+              <div class="case-editor-actions">
+                <button class="primary" type="submit">Save case</button>
+                <button id="reset-case-form" class="control-button" type="button">Clear</button>
+              </div>
+              <div id="case-editor-status" class="case-editor-status" aria-live="polite"></div>
+            </form>
+
+            <section class="panel case-list">
+              <h2>Published and draft cases</h2>
+              <p><small>Published cases appear after Applications on the public homepage. Drafts are visible only here.</small></p>
+              <div id="admin-case-list" aria-live="polite"></div>
+            </section>
+          </div>
+        </section>
       </section>
     </div>
 
@@ -207,8 +314,15 @@
       const previousPageButton = document.querySelector('#previous-page');
       const nextPageButton = document.querySelector('#next-page');
       const apiUrl = '/api/admin';
+      const casesApiUrl = '/api/admin/cases';
+      const caseForm = document.querySelector('#case-form');
+      const caseList = document.querySelector('#admin-case-list');
+      const caseEditorStatus = document.querySelector('#case-editor-status');
+      const caseCoverInput = document.querySelector('#case-cover');
+      const caseCoverPreview = document.querySelector('#case-cover-preview');
       let currentPage = 1;
       let totalPages = 1;
+      let adminCases = [];
 
       const setLoggedIn = (loggedIn) => {
         loginPanel.classList.toggle('hidden', loggedIn);
@@ -404,6 +518,152 @@
         }
       };
 
+      const loadAdminCases = async () => {
+        caseList.textContent = 'Loading cases...';
+        const response = await fetch(casesApiUrl, { credentials: 'same-origin' });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) {
+          if (response.status === 401) setLoggedIn(false);
+          throw new Error(payload.message || 'Unable to load cases.');
+        }
+        adminCases = payload.cases;
+        renderAdminCases();
+      };
+
+      const renderAdminCases = () => {
+        caseList.replaceChildren();
+        if (!adminCases.length) {
+          caseList.textContent = 'No cases yet. Add the first one using the form.';
+          return;
+        }
+
+        adminCases.forEach((projectCase) => {
+          const row = document.createElement('div');
+          row.className = 'admin-case-row';
+          const copy = document.createElement('div');
+          const title = document.createElement('strong');
+          title.textContent = projectCase.title_en;
+          const meta = document.createElement('small');
+          meta.textContent = `${projectCase.status === 'published' ? 'Published' : 'Draft'} · ${projectCase.location_en} · ${projectCase.category_en}`;
+          copy.append(title, meta);
+          const actions = document.createElement('div');
+          actions.className = 'admin-case-actions';
+          const edit = document.createElement('button');
+          edit.type = 'button';
+          edit.dataset.action = 'edit-case';
+          edit.dataset.caseId = projectCase.id;
+          edit.textContent = 'Edit';
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.dataset.action = 'delete-case';
+          remove.dataset.caseId = projectCase.id;
+          remove.textContent = 'Delete';
+          actions.append(edit, remove);
+          row.append(copy, actions);
+          caseList.appendChild(row);
+        });
+      };
+
+      const readCoverImage = async (file) => {
+        if (!file) return null;
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) throw new Error('Choose a JPG, PNG or WebP image.');
+        if (file.size > 2.5 * 1024 * 1024) throw new Error('Cover image must be no larger than 2.5 MB.');
+
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.addEventListener('load', () => resolve({
+            name: file.name,
+            type: file.type,
+            data: reader.result
+          }));
+          reader.addEventListener('error', () => reject(new Error('Unable to read this image file.')));
+          reader.readAsDataURL(file);
+        });
+      };
+
+      const resetCaseForm = () => {
+        caseForm.reset();
+        caseForm.elements.id.value = '';
+        document.querySelector('#case-form-title').textContent = 'Add a case';
+        caseCoverPreview.removeAttribute('src');
+        caseCoverPreview.classList.add('hidden');
+        caseEditorStatus.textContent = '';
+      };
+
+      const saveCase = async (event) => {
+        event.preventDefault();
+        const submitButton = caseForm.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        caseEditorStatus.textContent = 'Saving case...';
+        try {
+          const formData = new FormData(caseForm);
+          const coverImage = await readCoverImage(caseCoverInput.files[0]);
+          const payload = Object.fromEntries(formData.entries());
+          delete payload.cover_image;
+          if (coverImage) payload.cover_image = coverImage;
+          const response = await fetch(casesApiUrl, {
+            method: payload.id ? 'PATCH' : 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const result = await response.json();
+          if (!response.ok || !result.ok) {
+            throw new Error(result.message || 'Unable to save case.');
+          }
+          resetCaseForm();
+          await loadAdminCases();
+          caseEditorStatus.textContent = 'Case saved.';
+        } catch (error) {
+          caseEditorStatus.textContent = error.message || 'Unable to save case.';
+        } finally {
+          submitButton.disabled = false;
+        }
+      };
+
+      const editCase = (id) => {
+        const projectCase = adminCases.find((item) => item.id === id);
+        if (!projectCase) return;
+        Object.keys(projectCase).forEach((key) => {
+          if (caseForm.elements.namedItem(key)) {
+            caseForm.elements.namedItem(key).value = projectCase[key] || '';
+          }
+        });
+        caseForm.elements.id.value = projectCase.id;
+        document.querySelector('#case-form-title').textContent = 'Edit case';
+        caseEditorStatus.textContent = 'Editing this case. Save as draft or publish your changes.';
+        if (projectCase.cover_url) {
+          caseCoverPreview.src = projectCase.cover_url;
+          caseCoverPreview.classList.remove('hidden');
+        } else {
+          caseCoverPreview.classList.add('hidden');
+        }
+        caseForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+
+      const deleteCase = async (id) => {
+        if (!window.confirm('Delete this case and its cover image? This cannot be undone.')) return;
+        caseEditorStatus.textContent = 'Deleting case...';
+        try {
+          const response = await fetch(casesApiUrl, {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+          });
+          const result = await response.json();
+          if (!response.ok || !result.ok) {
+            throw new Error(result.message || 'Unable to delete case.');
+          }
+          if (caseForm.elements.id.value === id) resetCaseForm();
+          await loadAdminCases();
+          caseEditorStatus.textContent = 'Case deleted.';
+        } catch (error) {
+          caseEditorStatus.textContent = error.message || 'Unable to delete case.';
+        }
+      };
+
       loginForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const formData = new FormData(loginForm);
@@ -421,7 +681,7 @@
       document.querySelector('#filter-form').addEventListener('submit', (event) => {
         event.preventDefault();
         currentPage = 1;
-        checkExistingSession();
+        refreshInquiries();
       });
       [statusFilter, typeFilter, pageSizeSelect].forEach((control) => {
         control.addEventListener('change', () => {
@@ -442,6 +702,41 @@
         }
       });
       document.querySelector('#refresh-button').addEventListener('click', refreshInquiries);
+      document.querySelector('.dashboard-tabs').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-view]');
+        if (!button) return;
+        document.querySelectorAll('.dashboard-tabs [data-view]').forEach((tab) => {
+          tab.setAttribute('aria-selected', String(tab === button));
+        });
+        document.querySelector('#inquiries-view').classList.toggle('hidden', button.dataset.view !== 'inquiries-view');
+        document.querySelector('#cases-view').classList.toggle('hidden', button.dataset.view !== 'cases-view');
+        if (button.dataset.view === 'cases-view') {
+          loadAdminCases().catch((error) => {
+            caseList.textContent = error.message || 'Unable to load cases.';
+          });
+        }
+      });
+      caseForm.addEventListener('submit', saveCase);
+      document.querySelector('#reset-case-form').addEventListener('click', resetCaseForm);
+      caseCoverInput.addEventListener('change', async () => {
+        caseEditorStatus.textContent = '';
+        try {
+          const image = await readCoverImage(caseCoverInput.files[0]);
+          if (!image) return;
+          caseCoverPreview.src = image.data;
+          caseCoverPreview.classList.remove('hidden');
+        } catch (error) {
+          caseCoverInput.value = '';
+          caseEditorStatus.textContent = error.message;
+          caseCoverPreview.classList.add('hidden');
+        }
+      });
+      caseList.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-action][data-case-id]');
+        if (!button) return;
+        if (button.dataset.action === 'edit-case') editCase(button.dataset.caseId);
+        if (button.dataset.action === 'delete-case') deleteCase(button.dataset.caseId);
+      });
       inquiryTableBody.addEventListener('click', (event) => {
         const saveButton = event.target.closest('[data-action="save"]');
         if (saveButton) saveInquiry(saveButton.closest('tr'));

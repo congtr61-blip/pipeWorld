@@ -1,7 +1,9 @@
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
+const casesHandler = require('./api/cases');
 const contactHandler = require('./api/contact');
+const adminCasesHandler = require('./api/admin/cases');
 const adminHandler = require('./api/admin');
 
 const rootDirectory = __dirname;
@@ -71,6 +73,10 @@ const handleApiRequest = async (req, res, body) => {
   const pathname = new URL(req.url, 'http://localhost').pathname;
   const handler = pathname === '/api/contact'
     ? contactHandler
+    : pathname === '/api/cases'
+      ? casesHandler
+      : pathname === '/api/admin/cases'
+        ? adminCasesHandler
     : pathname === '/api/admin'
       ? adminHandler
       : null;
@@ -124,7 +130,7 @@ http.createServer(async (req, res) => {
     req.setEncoding('utf8');
     req.on('data', (chunk) => {
       rawBody += chunk;
-      if (rawBody.length > 64 * 1024) {
+      if (rawBody.length > 4 * 1024 * 1024) {
         req.destroy();
       }
     });

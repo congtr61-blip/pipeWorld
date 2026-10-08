@@ -317,3 +317,5 @@ module.exports = async function handler(req, res) {
   res.setHeader('Allow', 'GET, POST, PATCH, DELETE');
   return res.status(405).json({ ok: false, message: 'Method not allowed' });
 };
+
+module.exports.isAuthenticated = hasValidSession;

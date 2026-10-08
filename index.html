@@ -552,6 +552,37 @@
         color: #fff;
       }
 
+      .case-card .case-image {
+        position: relative;
+        display: grid;
+        height: 230px;
+        overflow: hidden;
+        place-items: center;
+        background: #f1f4f6;
+      }
+
+      .case-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 300ms ease;
+      }
+
+      .case-card:hover .case-image img { transform: scale(1.04); }
+      .case-card-link { display: block; height: 100%; }
+      .case-card-meta { margin-top: 7px; color: var(--muted); font-size: 11px; }
+      .case-empty { color: var(--muted); font-size: 13px; }
+      .social-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: inherit;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .social-link:hover { color: #7fc6fb; }
+
       .empty-state {
         display: none;
         padding: 40px 0;
@@ -1566,7 +1597,11 @@
           <a href="tel:+26774082086">Call: +267 7408 2086</a>
           <a href="mailto:pipeworldbw@gmail.com">pipeworldbw@gmail.com</a>
         </div>
-        <div class="topline-social"><span>Gaborone, Botswana</span><span>Quality pipes. Trusted supply.</span></div>
+        <div class="topline-social">
+          <span>Gaborone, Botswana</span>
+          <span>Quality pipes. Trusted supply.</span>
+          <a class="social-link" href="https://www.facebook.com/profile.php?id=61595181328626" target="_blank" rel="noopener noreferrer" aria-label="Visit Pipe World on Facebook">Facebook ↗</a>
+        </div>
       </div>
     </div>
 
@@ -1584,7 +1619,7 @@
           <a href="#home">Home</a>
           <a href="#about">About Us</a>
           <a href="#products">Products</a>
-          <a href="#plant">Cooperation</a>
+          <a href="#cases">Projects</a>
           <a href="#news">News</a>
           <button class="language-toggle" type="button" aria-label="切换到中文" lang="zh">中文</button>
           <a class="nav-contact" href="#contact">Contact Us <span aria-hidden="true">↗</span></a>
@@ -1748,6 +1783,21 @@
               <span>Agricultural Pipes</span>
             </a>
           </div>
+        </div>
+      </section>
+
+      <section class="section" id="cases">
+        <div class="container">
+          <div class="section-header">
+            <div>
+              <div class="section-kicker">Project experience</div>
+              <h2>Cooperation cases</h2>
+            </div>
+            <p>Selected projects and partnerships delivered with Pipe World products and support.</p>
+          </div>
+          <div class="product-grid case-grid" id="case-grid" aria-live="polite"></div>
+          <p class="case-empty" id="case-empty">Project cases will be published here.</p>
+          <p class="case-empty" id="case-error" hidden>Project cases could not be loaded. Please try again later.</p>
         </div>
       </section>
 
@@ -1930,6 +1980,7 @@
             <p>Quality pipe products and customer support, based in Gaborone, Botswana.</p>
             <p><a href="tel:+26774082086">Cell: +267 7408 2086</a><br /><a href="tel:+2672650000">Tel: +267 265 0000</a></p>
             <p><a href="mailto:pipeworldbw@gmail.com">Email: pipeworldbw@gmail.com</a></p>
+            <p><a href="https://www.facebook.com/profile.php?id=61595181328626" target="_blank" rel="noopener noreferrer">Facebook page ↗</a></p>
             <p>Plot 54225, Block 3<br />Gaborone, Botswana</p>
           </div>
           <div>
@@ -1995,6 +2046,7 @@
         "About Us": "关于我们",
         "Products": "产品中心",
         "Cooperation": "合作与工厂",
+        "Projects": "合作案例",
         "News": "新闻资讯",
         "Contact Us": "联系我们",
         "PIPE WORLD · BOTSWANA": "PIPE WORLD · 博茨瓦纳",
@@ -2039,6 +2091,13 @@
         "Municipal Engineering Pipelines": "市政工程管道",
         "Home Decoration Piping": "家装管道",
         "Agricultural Pipes": "农业管道",
+        "Project experience": "项目经验",
+        "Cooperation cases": "合作案例",
+        "Selected projects and partnerships delivered with Pipe World products and support.":
+          "展示使用 Pipe World 产品并获得团队支持的项目与合作案例。",
+        "Project cases will be published here.": "合作案例将在此发布。",
+        "Project cases could not be loaded. Please try again later.": "暂时无法加载合作案例，请稍后重试。",
+        "Facebook page ↗": "Facebook 专页 ↗",
         "Plant & equipment": "厂房与设备",
         "Pipe manufacturing": "管材生产",
         "Pipe World factory": "Pipe World 工厂",
@@ -2439,6 +2498,7 @@
             }
           }
         },
+        case: {},
         company: {
           profile: {
             type: "general",
@@ -2561,6 +2621,7 @@
           }
         });
         if (activeDetail) renderDetail(activeDetail.kind, activeDetail.id, activeDetail.element);
+        renderPublishedCases();
         if (inquiryMessage.value === previousPrefilledMessage && previousPrefilledMessage) {
           prepareInquiry(inquiryType.value, inquirySubject.value);
         }
@@ -2580,9 +2641,106 @@
       const inquirySubject = document.querySelector("#inquiry-subject");
       const inquiryMessage = document.querySelector("#inquiry-message");
       const inquiryStatus = document.querySelector("#inquiry-status");
+      const caseGrid = document.querySelector("#case-grid");
+      const caseEmpty = document.querySelector("#case-empty");
+      const caseError = document.querySelector("#case-error");
       let activeDetail = null;
       let detailOpener = null;
       let previousPrefilledMessage = "";
+      let publishedCases = [];
+
+      function renderPublishedCases() {
+        caseGrid.replaceChildren();
+        caseEmpty.hidden = publishedCases.length > 0;
+        caseError.hidden = true;
+        const language = currentLanguage();
+
+        publishedCases.forEach((projectCase) => {
+          details.case[projectCase.id] = {
+            type: "cooperation",
+            subject: projectCase.title_en,
+            image: projectCase.cover_url,
+            en: {
+              title: projectCase.title_en,
+              description: projectCase.summary_en,
+              points: [
+                `Location: ${projectCase.location_en}`,
+                `Project type: ${projectCase.category_en}`,
+                projectCase.details_en
+              ]
+            },
+            zh: {
+              title: projectCase.title_zh,
+              description: projectCase.summary_zh,
+              points: [
+                `项目地点：${projectCase.location_zh}`,
+                `项目类型：${projectCase.category_zh}`,
+                projectCase.details_zh
+              ]
+            }
+          };
+
+          const card = document.createElement("article");
+          card.className = "product-card case-card";
+          const link = document.createElement("a");
+          link.className = "case-card-link";
+          link.href = "#contact";
+          link.dataset.detailKind = "case";
+          link.dataset.detailId = projectCase.id;
+          link.setAttribute(
+            "aria-label",
+            language === "zh" ? `查看案例：${projectCase.title_zh}` : `Read case: ${projectCase.title_en}`
+          );
+
+          const imageContainer = document.createElement("div");
+          imageContainer.className = "case-image";
+          if (projectCase.cover_url) {
+            const image = document.createElement("img");
+            image.src = projectCase.cover_url;
+            image.alt = language === "zh" ? projectCase.title_zh : projectCase.title_en;
+            image.loading = "lazy";
+            imageContainer.appendChild(image);
+          }
+
+          const body = document.createElement("div");
+          body.className = "product-body";
+          const copy = document.createElement("div");
+          const title = document.createElement("h3");
+          title.textContent = language === "zh" ? projectCase.title_zh : projectCase.title_en;
+          const summary = document.createElement("p");
+          summary.textContent = language === "zh" ? projectCase.summary_zh : projectCase.summary_en;
+          const metadata = document.createElement("p");
+          metadata.className = "case-card-meta";
+          metadata.textContent = language === "zh"
+            ? `${projectCase.location_zh} · ${projectCase.category_zh}`
+            : `${projectCase.location_en} · ${projectCase.category_en}`;
+          copy.append(title, summary, metadata);
+          const arrow = document.createElement("span");
+          arrow.className = "icon-link";
+          arrow.setAttribute("aria-hidden", "true");
+          arrow.textContent = "↗";
+          body.append(copy, arrow);
+          link.append(imageContainer, body);
+          card.appendChild(link);
+          caseGrid.appendChild(card);
+        });
+      }
+
+      async function loadPublishedCases() {
+        try {
+          const response = await fetch("/api/cases");
+          const result = await response.json();
+          if (!response.ok || !result.ok || !Array.isArray(result.cases)) {
+            throw new Error(result.message || "Unable to load case studies.");
+          }
+          publishedCases = result.cases;
+          renderPublishedCases();
+        } catch (error) {
+          console.error("Published cases could not be loaded:", error);
+          caseEmpty.hidden = true;
+          caseError.hidden = false;
+        }
+      }
 
       function renderDetail(kind, id, element) {
         const entry = details[kind]?.[id];
@@ -2597,9 +2755,11 @@
 
         const image = document.querySelector("#detail-image");
         const sourceImage = element.querySelector("img");
-        image.src = entry.image || sourceImage?.src || "";
+        const imageSource = entry.image || sourceImage?.getAttribute("src");
+        if (imageSource) image.src = imageSource;
+        else image.removeAttribute("src");
         image.alt = sourceImage?.alt || copy.title;
-        image.hidden = !image.src;
+        image.hidden = !imageSource;
 
         const points = document.querySelector("#detail-points");
         points.replaceChildren();
@@ -2819,6 +2979,7 @@
       backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 
       document.querySelector("#year").textContent = new Date().getFullYear();
+      loadPublishedCases();
     </script>
   </body>
 </html>
