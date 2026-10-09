@@ -81,6 +81,7 @@ After changing database schema or functions, redeploy the Vercel project so the 
 - The admin dashboard has an **Enquiries / Cooperation cases** switch. The case editor uses basic English/Chinese text fields, a single optional JPG/PNG/WebP cover (up to 2.5 MB), and a draft/publish selector. No HTML or rich-text formatting is required.
 - Published cases appear in the homepage **Cooperation cases** section between Applications and Plant & Equipment. Drafts remain visible only in the admin dashboard.
 - Case creation and updates require a Supabase service-role key and the `project_cases` table plus `pipeworld-cases` storage bucket. Apply the SQL before deploying the new API.
+- The homepage opens with a four-image factory and delivery slideshow, with manual slide selectors, pause/resume controls, and reduced-motion support. The **Factory** section includes all 42 WeChat photos as optimized, lazy-loaded gallery images under `assets/factory-gallery/`, paginated eight at a time on desktop and four at a time on mobile; the original source files remain in `assets/wechat/`.
 
 ## Admin login
 

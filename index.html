@@ -224,19 +224,48 @@
         min-height: 610px;
         align-items: center;
         overflow: hidden;
-        background:
-          linear-gradient(90deg, rgba(8, 25, 40, 0.9) 0%, rgba(8, 25, 40, 0.72) 43%, rgba(8, 25, 40, 0.18) 100%),
-          url("assets/product-hdpe-pressure.jpg") center 52% / cover,
-          #18344a;
+        background: #18344a;
         color: #fff;
         isolation: isolate;
+      }
+
+      .hero-slides,
+      .hero-slide,
+      .hero-slide img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .hero-slides {
+        z-index: -2;
+        overflow: hidden;
+      }
+
+      .hero-slide {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 800ms ease, visibility 0s linear 800ms;
+      }
+
+      .hero-slide.is-active {
+        visibility: visible;
+        opacity: 1;
+        transition-delay: 0s;
+      }
+
+      .hero-slide img {
+        object-fit: cover;
       }
 
       .hero::after {
         position: absolute;
         z-index: -1;
         inset: 0;
-        background: linear-gradient(0deg, rgba(8, 25, 40, 0.2), transparent 55%);
+        background:
+          linear-gradient(90deg, rgba(8, 25, 40, 0.88) 0%, rgba(8, 25, 40, 0.72) 43%, rgba(8, 25, 40, 0.18) 100%),
+          linear-gradient(0deg, rgba(8, 25, 40, 0.3), transparent 55%);
         content: "";
       }
 
@@ -306,11 +335,66 @@
 
       .hero-caption {
         position: absolute;
-        right: max(32px, calc((100vw - var(--content)) / 2));
-        bottom: 27px;
+        right: max(32px, calc((100vw - var(--content)) / 2 + 245px));
+        bottom: 32px;
         color: rgba(255, 255, 255, 0.75);
         font-size: 11px;
         letter-spacing: 0.12em;
+      }
+
+      .hero-controls {
+        position: absolute;
+        right: max(32px, calc((100vw - var(--content)) / 2));
+        bottom: 19px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .hero-slide-picker,
+      .hero-play-toggle {
+        display: inline-grid;
+        width: 36px;
+        height: 36px;
+        flex: 0 0 auto;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        border-radius: 50%;
+        background: rgba(8, 25, 40, 0.32);
+        color: #fff;
+        cursor: pointer;
+        transition: background 160ms ease, border-color 160ms ease;
+      }
+
+      .hero-slide-picker:hover,
+      .hero-play-toggle:hover {
+        border-color: #fff;
+        background: rgba(8, 25, 40, 0.75);
+      }
+
+      .hero-slide-picker {
+        width: 10px;
+        height: 10px;
+        border: 0;
+        background: rgba(255, 255, 255, 0.55);
+        transition: width 180ms ease, background 180ms ease;
+      }
+
+      .hero-slide-picker[aria-pressed="true"] {
+        width: 25px;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .hero-play-toggle {
+        margin-left: 4px;
+        font-size: 11px;
+      }
+
+      .hero-slide-picker:focus-visible,
+      .hero-play-toggle:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 3px;
       }
 
       .quick-search {
@@ -726,6 +810,116 @@
         border-radius: 3px;
         background: #e7edf1;
         object-fit: cover;
+      }
+
+      .factory-gallery {
+        margin-top: 64px;
+      }
+
+      .factory-gallery-heading {
+        max-width: 620px;
+        margin-bottom: 21px;
+      }
+
+      .factory-gallery-heading h3 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: -0.025em;
+      }
+
+      .factory-gallery-heading p {
+        margin: 9px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .factory-gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .factory-gallery-item {
+        display: block;
+        margin: 0;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: #fff;
+        color: var(--ink);
+        transition: box-shadow 180ms ease, transform 180ms ease;
+      }
+
+      .factory-gallery-item:hover {
+        box-shadow: 0 12px 28px rgba(16, 39, 56, 0.12);
+        transform: translateY(-2px);
+      }
+
+      .factory-gallery-item > a {
+        display: block;
+        color: inherit;
+      }
+
+      .factory-gallery-item img {
+        display: block;
+        width: 100%;
+        height: 170px;
+        background: #e7edf1;
+        object-fit: cover;
+        transition: transform 220ms ease;
+      }
+
+      .factory-gallery-item:hover img {
+        transform: scale(1.035);
+      }
+
+      .factory-gallery-item figcaption {
+        padding: 10px 11px;
+        font-size: 11px;
+        font-weight: 650;
+        line-height: 1.45;
+      }
+
+      .factory-gallery-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 22px;
+      }
+
+      .factory-gallery-page-button {
+        min-width: 94px;
+        min-height: 40px;
+        padding: 0 13px;
+        border: 1px solid #dce4ea;
+        border-radius: 3px;
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+      }
+
+      .factory-gallery-page-button:hover:not(:disabled) {
+        border-color: var(--blue);
+        background: var(--blue);
+        color: #fff;
+      }
+
+      .factory-gallery-page-button:disabled {
+        color: #9aa5ad;
+        cursor: not-allowed;
+      }
+
+      .factory-gallery-page-status {
+        min-width: 80px;
+        color: var(--muted);
+        font-size: 12px;
+        text-align: center;
       }
 
       .feature-link {
@@ -1355,7 +1549,6 @@
 
         .hero {
           min-height: 530px;
-          background-position: center, 58% center, center;
         }
 
         .hero-content {
@@ -1368,8 +1561,40 @@
         }
 
         .hero-caption {
+          right: auto;
+          bottom: 28px;
+          left: 19px;
+          max-width: 38%;
+          font-size: 9px;
+        }
+
+        .hero-controls {
           right: 19px;
-          bottom: 20px;
+          bottom: 17px;
+          gap: 7px;
+        }
+
+        .hero-play-toggle {
+          width: 32px;
+          height: 32px;
+        }
+
+        .factory-gallery {
+          margin-top: 46px;
+        }
+
+        .factory-gallery-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+        }
+
+        .factory-gallery-item img {
+          height: 135px;
+        }
+
+        .factory-gallery-item figcaption {
+          padding: 8px;
+          font-size: 10px;
         }
 
         .quick-search {
@@ -1619,6 +1844,7 @@
           <a href="#home">Home</a>
           <a href="#about">About Us</a>
           <a href="#products">Products</a>
+          <a href="#plant">Factory</a>
           <a href="#cases">Projects</a>
           <a href="#news">News</a>
           <button class="language-toggle" type="button" aria-label="切换到中文" lang="zh">中文</button>
@@ -1629,6 +1855,12 @@
 
     <main>
       <section class="hero" id="home">
+        <div class="hero-slides" aria-hidden="true">
+          <div class="hero-slide is-active"><img data-src="assets/hero-pipeworld-delivery.jpg" alt="" fetchpriority="high" /></div>
+          <div class="hero-slide"><img data-src="assets/hero-production-line.jpg" alt="" /></div>
+          <div class="hero-slide"><img data-src="assets/hero-factory-floor.jpg" alt="" /></div>
+          <div class="hero-slide"><img data-src="assets/hero-extrusion-system.jpg" alt="" /></div>
+        </div>
         <div class="hero-content">
           <div class="eyebrow">PIPE WORLD · BOTSWANA</div>
           <h1>Reliable pipes.<br /><span>Built for what flows next.</span></h1>
@@ -1642,6 +1874,13 @@
           </div>
         </div>
         <div class="hero-caption">QUALITY · SERVICE · TRUST</div>
+        <div class="hero-controls" role="group" aria-label="Homepage image slideshow controls">
+          <button class="hero-slide-picker" type="button" data-hero-slide="0" aria-label="Show slide 1" aria-pressed="true"></button>
+          <button class="hero-slide-picker" type="button" data-hero-slide="1" aria-label="Show slide 2" aria-pressed="false"></button>
+          <button class="hero-slide-picker" type="button" data-hero-slide="2" aria-label="Show slide 3" aria-pressed="false"></button>
+          <button class="hero-slide-picker" type="button" data-hero-slide="3" aria-label="Show slide 4" aria-pressed="false"></button>
+          <button class="hero-play-toggle" type="button" aria-label="Pause slideshow">Ⅱ</button>
+        </div>
       </section>
 
       <form class="quick-search" id="product-search" role="search">
@@ -1804,7 +2043,7 @@
       <section class="section" id="plant">
         <div class="container plant-layout">
           <div class="plant-photo">
-            <img src="assets/equipment-04.jpg" alt="Pipe manufacturing equipment" loading="lazy" />
+            <img src="assets/factory-production-floor.jpg" alt="Pipe World factory production floor" loading="lazy" />
             <span>Pipe manufacturing</span>
           </div>
           <div class="plant-content">
@@ -1815,12 +2054,24 @@
               manufacturing capabilities and equipment support consistent quality from production through delivery.
             </p>
             <div class="equipment-grid" aria-label="Factory equipment">
-              <img src="assets/equipment-01.jpg" alt="Production equipment" loading="lazy" />
-              <img src="assets/equipment-02.jpg" alt="Factory machinery" loading="lazy" />
-              <img src="assets/equipment-03.jpg" alt="Pipe manufacturing equipment" loading="lazy" />
+              <img src="assets/factory-extrusion-line.jpg" alt="Pipe extrusion production line" loading="lazy" />
+              <img src="assets/pipe-quality-testing-machine.jpg" alt="Pipe material testing machine" loading="lazy" />
+              <img src="assets/finished-blue-pipes.jpg" alt="Finished blue pipes ready for supply" loading="lazy" />
             </div>
             <a class="feature-link" href="#contact" data-detail-kind="cooperation" data-detail-id="partnership">Learn about cooperation <span aria-hidden="true">→</span></a>
           </div>
+        </div>
+        <div class="container factory-gallery">
+          <div class="factory-gallery-heading">
+            <h3>Inside our factory</h3>
+            <p>Production, pipe products, quality testing and delivery from Pipe World.</p>
+          </div>
+          <div class="factory-gallery-grid" id="factory-gallery-grid"></div>
+          <nav class="factory-gallery-pagination" aria-label="Factory gallery pages">
+            <button class="factory-gallery-page-button" id="factory-gallery-previous" type="button" disabled>Previous</button>
+            <span class="factory-gallery-page-status" id="factory-gallery-page-status" aria-live="polite"></span>
+            <button class="factory-gallery-page-button" id="factory-gallery-next" type="button">Next</button>
+          </nav>
         </div>
       </section>
 
@@ -1828,7 +2079,7 @@
         <div class="container">
           <div class="about-layout">
             <div class="about-image">
-              <img src="assets/factory.jpg" alt="Pipe World factory facilities" loading="lazy" />
+              <img src="assets/delivery-pipeworld-truck.jpg" alt="Pipe World truck loaded with pipes at the distribution yard" loading="lazy" />
             </div>
             <div class="split-copy">
               <div class="section-kicker">About Pipe World</div>
@@ -2045,6 +2296,7 @@
         "Home": "首页",
         "About Us": "关于我们",
         "Products": "产品中心",
+        "Factory": "工厂图库",
         "Cooperation": "合作与工厂",
         "Projects": "合作案例",
         "News": "新闻资讯",
@@ -2100,6 +2352,19 @@
         "Facebook page ↗": "Facebook 专页 ↗",
         "Plant & equipment": "厂房与设备",
         "Pipe manufacturing": "管材生产",
+        "Pipe World factory production floor": "Pipe World 工厂生产区域",
+        "Pipe extrusion production line": "管材挤出生产线",
+        "Pipe material testing machine": "管材检测设备",
+        "Finished blue pipes ready for supply": "待供货的成品蓝色管材",
+        "Pipe World truck loaded with pipes at the distribution yard": "Pipe World 满载管材的运输卡车",
+        "Inside our factory": "走进 Pipe World 工厂",
+        "Production, pipe products, quality testing and delivery from Pipe World.": "Pipe World 的生产现场、管材产品、质量检测与运输实拍。",
+        "Homepage image slideshow controls": "首页图片轮播控制",
+        "Pause slideshow": "暂停轮播",
+        "Start slideshow": "播放轮播",
+        "Factory gallery pages": "工厂图库分页",
+        "Previous": "上一页",
+        "Next": "下一页",
         "Pipe World factory": "Pipe World 工厂",
         "Pipe World factory facilities": "Pipe World 工厂设施",
         "Investing in better products and processes": "持续提升产品与生产工艺",
@@ -2326,10 +2591,62 @@
 
       const originalTextNodes = new Map();
       const originalImageAlts = new Map();
+      const factoryGalleryFiles = [
+        "upvc-pipe-sections-01.jpg",
+        "upvc-pipe-sections-02.jpg",
+        "pipe-delivery-truck.jpg",
+        "pipe-delivery-trailer.jpg",
+        "hdpe-pipe-coil-stock.jpg",
+        "factory-production-line-01.jpg",
+        "factory-extrusion-line-01.jpg",
+        "quality-control-scale.jpg",
+        "pipe-testing-laboratory-01.jpg",
+        "pipe-tensile-testing-machine.jpg",
+        "pipe-testing-equipment.jpg",
+        "extrusion-cooling-line.jpg",
+        "pipe-production-line-02.jpg",
+        "pipe-test-machine-detail.jpg",
+        "pipe-extrusion-machine-02.jpg",
+        "pipe-product-samples.jpg",
+        "quality-control-laboratory.jpg",
+        "pipe-production-line-03.jpg",
+        "pipe-production-line-04.jpg",
+        "pipe-extrusion-equipment-01.jpg",
+        "pipe-extrusion-equipment-02.jpg",
+        "factory-overhead-production-line.jpg",
+        "factory-production-floor.jpg",
+        "pipe-production-line-05.jpg",
+        "pipe-production-line-06.jpg",
+        "pipe-extrusion-workshop.jpg",
+        "blue-pipe-production-stock-01.jpg",
+        "blue-pipe-production-stock-02.jpg",
+        "blue-pipe-production-stock-03.jpg",
+        "pipe-production-line-07.jpg",
+        "pipe-extrusion-control-panel.jpg",
+        "blue-pipe-manufacturing.jpg",
+        "pipe-extruder-system-01.jpg",
+        "pipe-extruder-system-02.jpg",
+        "pipe-extruder-system-03.jpg",
+        "blue-pipe-product-closeup-01.jpg",
+        "blue-pipe-product-closeup-02.jpg",
+        "blue-pipe-product-closeup-03.jpg",
+        "factory-extrusion-system-01.jpg",
+        "factory-extrusion-system-02.jpg",
+        "raw-material-mixer-01.jpg",
+        "raw-material-mixer-02.jpg"
+      ];
+      const heroSlideCaptions = [
+        { en: "Ready for delivery", zh: "管材备货与配送" },
+        { en: "Pipe extrusion", zh: "管材挤出生产" },
+        { en: "Our production floor", zh: "工厂生产区域" },
+        { en: "Production equipment", zh: "管材生产设备" }
+      ];
       const localizedAttributes = [
         [".brand", "aria-label", "Pipe World home", "Pipe World 首页"],
         [".menu-toggle", "aria-label", "Open navigation menu", "打开导航菜单"],
         [".nav-links", "aria-label", "Main navigation", "主导航"],
+        [".hero-controls", "aria-label", "Homepage image slideshow controls", "首页图片轮播控制"],
+        [".factory-gallery-pagination", "aria-label", "Factory gallery pages", "工厂图库分页"],
         [".search-label", "for", "search-input", "search-input"],
         ["#search-input", "placeholder", "Search products and applications", "搜索产品或应用领域"],
         ['.search-box button', "aria-label", "Search products", "搜索产品"],
@@ -2571,6 +2888,140 @@
         return value.trim().replace(/\s+/g, " ");
       }
 
+      const heroElement = document.querySelector(".hero");
+      const heroSlides = [...document.querySelectorAll(".hero-slide")];
+      const heroSlidePickers = [...document.querySelectorAll(".hero-slide-picker")];
+      const heroCaption = document.querySelector(".hero-caption");
+      const heroPlayToggle = document.querySelector(".hero-play-toggle");
+      const factoryGalleryGrid = document.querySelector("#factory-gallery-grid");
+      const factoryGalleryPrevious = document.querySelector("#factory-gallery-previous");
+      const factoryGalleryNext = document.querySelector("#factory-gallery-next");
+      const factoryGalleryPageStatus = document.querySelector("#factory-gallery-page-status");
+      const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      let activeHeroSlide = 0;
+      let heroPaused = reduceMotionQuery.matches;
+      let heroPointerInside = false;
+      let heroFocusInside = false;
+      let heroTimer = null;
+      let factoryGalleryPage = 0;
+      let factoryGalleryPageSize = window.matchMedia("(max-width: 720px)").matches ? 4 : 8;
+
+      function galleryTitle(fileName) {
+        return fileName
+          .replace(/\.jpg$/i, "")
+          .replace(/-\d+$/, "")
+          .split("-")
+          .map((word) => {
+            if (word === "upvc") return "U-PVC";
+            if (word === "hdpe") return "HDPE";
+            return word.charAt(0).toUpperCase() + word.slice(1);
+          })
+          .join(" ");
+      }
+
+      function renderFactoryGallery(language = currentLanguage()) {
+        factoryGalleryGrid.replaceChildren();
+        const isChinese = language === "zh";
+        const pageCount = Math.ceil(factoryGalleryFiles.length / factoryGalleryPageSize);
+        factoryGalleryPage = Math.min(factoryGalleryPage, pageCount - 1);
+        const firstFileIndex = factoryGalleryPage * factoryGalleryPageSize;
+        const visibleFiles = factoryGalleryFiles.slice(
+          firstFileIndex,
+          firstFileIndex + factoryGalleryPageSize
+        );
+
+        visibleFiles.forEach((fileName, pageIndex) => {
+          const index = firstFileIndex + pageIndex;
+          const title = galleryTitle(fileName);
+          const itemNumber = String(index + 1).padStart(2, "0");
+          const chineseCategory = /delivery/.test(fileName)
+            ? "管材运输与配送"
+            : /quality|test|testing|control/.test(fileName)
+              ? "管材质量检测"
+              : /stock|samples|sections|closeup|coil/.test(fileName)
+                ? "管材与原料实拍"
+                : "工厂生产与设备";
+          const caption = isChinese
+            ? `${chineseCategory} ${itemNumber}`
+            : `${title} ${itemNumber}`;
+          const imagePath = `assets/factory-gallery/${fileName}`;
+          const item = document.createElement("figure");
+          item.className = "factory-gallery-item";
+          const link = document.createElement("a");
+          link.className = "factory-gallery-link";
+          link.href = imagePath;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.setAttribute("aria-label", caption);
+
+          const image = document.createElement("img");
+          image.src = imagePath;
+          image.alt = isChinese ? `Pipe World ${caption}` : `Pipe World ${title}`;
+          image.loading = "lazy";
+          image.decoding = "async";
+
+          const itemCaption = document.createElement("figcaption");
+          itemCaption.textContent = caption;
+          link.appendChild(image);
+          item.append(link, itemCaption);
+          factoryGalleryGrid.appendChild(item);
+        });
+        factoryGalleryPrevious.disabled = factoryGalleryPage === 0;
+        factoryGalleryNext.disabled = factoryGalleryPage >= pageCount - 1;
+        factoryGalleryPageStatus.textContent = isChinese
+          ? `第 ${factoryGalleryPage + 1} / ${pageCount} 页`
+          : `Page ${factoryGalleryPage + 1} of ${pageCount}`;
+      }
+
+      function updateHeroPauseButton() {
+        const isChinese = currentLanguage() === "zh";
+        heroPlayToggle.textContent = heroPaused ? "▶" : "Ⅱ";
+        heroPlayToggle.setAttribute(
+          "aria-label",
+          heroPaused
+            ? (isChinese ? "播放轮播" : "Start slideshow")
+            : (isChinese ? "暂停轮播" : "Pause slideshow")
+        );
+        heroPlayToggle.setAttribute("aria-pressed", String(heroPaused));
+      }
+
+      function showHeroSlide(index, language = currentLanguage()) {
+        activeHeroSlide = (index + heroSlides.length) % heroSlides.length;
+        const image = heroSlides[activeHeroSlide].querySelector("img");
+        if (!image.hasAttribute("src")) {
+          image.src = image.dataset.src;
+          image.addEventListener("error", () => {
+            console.error("Homepage slideshow image could not be loaded:", image.dataset.src);
+          }, { once: true });
+        }
+
+        heroSlides.forEach((slide, slideIndex) => {
+          slide.classList.toggle("is-active", slideIndex === activeHeroSlide);
+        });
+        heroSlidePickers.forEach((picker, pickerIndex) => {
+          picker.setAttribute("aria-pressed", String(pickerIndex === activeHeroSlide));
+          picker.setAttribute(
+            "aria-label",
+            language === "zh" ? `显示第 ${pickerIndex + 1} 张图片` : `Show slide ${pickerIndex + 1}`
+          );
+        });
+        heroCaption.textContent = heroSlideCaptions[activeHeroSlide][language];
+      }
+
+      function updateHeroTimer() {
+        window.clearInterval(heroTimer);
+        if (heroPaused || heroPointerInside || heroFocusInside || document.hidden) return;
+        heroTimer = window.setInterval(() => {
+          showHeroSlide(activeHeroSlide + 1);
+        }, 6000);
+      }
+
+      function setHeroPaused(paused) {
+        heroPaused = paused;
+        updateHeroPauseButton();
+        updateHeroTimer();
+      }
+
       function setLanguage(language) {
         const isChinese = language === "zh";
         const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -2603,6 +3054,9 @@
         });
 
         document.documentElement.lang = isChinese ? "zh-CN" : "en";
+        renderFactoryGallery(language);
+        showHeroSlide(activeHeroSlide, language);
+        updateHeroPauseButton();
         document.title = isChinese ? "博茨瓦纳 Pipe World 管材 | 品质管材，可靠供应" : originalTitle;
         document.querySelector('meta[name="description"]').content = isChinese
           ? "PIPE WORLD (PTY) LTD 于博茨瓦纳提供优质 U-PVC、HDPE 管材及电力套管。"
@@ -2977,6 +3431,62 @@
         backToTop.classList.toggle("is-visible", window.scrollY > 500);
       }, { passive: true });
       backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+      heroSlidePickers.forEach((picker) => {
+        picker.addEventListener("click", () => {
+          showHeroSlide(Number(picker.dataset.heroSlide));
+          updateHeroTimer();
+        });
+      });
+      heroPlayToggle.addEventListener("click", () => {
+        const pause = !heroPaused;
+        if (!pause) heroFocusInside = false;
+        setHeroPaused(pause);
+      });
+      heroElement.addEventListener("pointerenter", () => {
+        heroPointerInside = true;
+        updateHeroTimer();
+      });
+      heroElement.addEventListener("pointerleave", () => {
+        heroPointerInside = false;
+        updateHeroTimer();
+      });
+      heroElement.addEventListener("focusin", () => {
+        heroFocusInside = true;
+        updateHeroTimer();
+      });
+      heroElement.addEventListener("focusout", (event) => {
+        if (!heroElement.contains(event.relatedTarget)) {
+          heroFocusInside = false;
+          updateHeroTimer();
+        }
+      });
+      document.addEventListener("visibilitychange", updateHeroTimer);
+      reduceMotionQuery.addEventListener("change", (event) => {
+        if (event.matches) setHeroPaused(true);
+      });
+      factoryGalleryPrevious.addEventListener("click", () => {
+        if (factoryGalleryPage === 0) return;
+        factoryGalleryPage -= 1;
+        renderFactoryGallery();
+      });
+      factoryGalleryNext.addEventListener("click", () => {
+        const lastPage = Math.ceil(factoryGalleryFiles.length / factoryGalleryPageSize) - 1;
+        if (factoryGalleryPage >= lastPage) return;
+        factoryGalleryPage += 1;
+        renderFactoryGallery();
+      });
+      window.matchMedia("(max-width: 720px)").addEventListener("change", (event) => {
+        const nextPageSize = event.matches ? 4 : 8;
+        if (factoryGalleryPageSize === nextPageSize) return;
+        factoryGalleryPageSize = nextPageSize;
+        factoryGalleryPage = 0;
+        renderFactoryGallery();
+      });
+      renderFactoryGallery();
+      showHeroSlide(0);
+      updateHeroPauseButton();
+      updateHeroTimer();
 
       document.querySelector("#year").textContent = new Date().getFullYear();
       loadPublishedCases();
