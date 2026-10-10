@@ -942,22 +942,21 @@
 
       .about-layout {
         display: grid;
-        grid-template-columns: 0.78fr 1.22fr;
-        gap: 62px;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
         align-items: center;
       }
 
       .about-image {
-        min-height: 360px;
         overflow: hidden;
         border-radius: 4px;
-        background: #e7edf1;
+        background: #fff;
       }
 
       .about-image img {
         width: 100%;
-        height: 360px;
-        object-fit: cover;
+        height: auto;
+        object-fit: contain;
       }
 
       .about-points {
@@ -1386,7 +1385,6 @@
         width: 175px;
         padding: 8px;
         border-radius: 2px;
-        background: #fff;
       }
 
       .footer h3 {
@@ -1674,10 +1672,8 @@
           height: 75px;
         }
 
-        .about-image,
-        .about-image img {
-          height: 290px;
-          min-height: 290px;
+        .about-image {
+          min-height: 0;
         }
 
         .credentials {
@@ -2079,7 +2075,7 @@
         <div class="container">
           <div class="about-layout">
             <div class="about-image">
-              <img src="assets/delivery-pipeworld-truck.jpg" alt="Pipe World truck loaded with pipes at the distribution yard" loading="lazy" />
+              <img src="assets/premium-application.png" alt="Pipe World premium PVC pipes and application infographic" loading="lazy" />
             </div>
             <div class="split-copy">
               <div class="section-kicker">About Pipe World</div>
@@ -2125,7 +2121,7 @@
           <div class="news-grid">
             <article class="news-card">
               <div class="news-image">
-                <img src="assets/news-industry.jpg" alt="Pipe manufacturing technology" loading="lazy" />
+                <img src="assets/factory-extrusion-line.jpg" alt="Pipe extrusion production line" loading="lazy" />
               </div>
               <div class="news-body">
                 <span class="news-date">Industry dynamics · 16 Dec</span>
@@ -2136,7 +2132,7 @@
             </article>
             <article class="news-card">
               <div class="news-image">
-                <img src="assets/qualification-01.jpg" alt="Pipe World company news" loading="lazy" />
+                <img src="assets/delivery-pipeworld-truck.jpg" alt="Pipe World truck loaded with pipes at the distribution yard" loading="lazy" />
               </div>
               <div class="news-body">
                 <span class="news-date">Corporate news · 16 Dec</span>
@@ -2854,7 +2850,7 @@
           advantages: {
             type: "general",
             subject: "What are the advantages of PIPE WORLD?",
-            image: "assets/news-industry.jpg",
+            image: "assets/factory-extrusion-line.jpg",
             en: {
               title: "What are the advantages of PIPE WORLD?",
               description: "Pipe World describes its manufacturing approach as using advanced pipeline manufacturing technology, automated production and ongoing product development.",
@@ -2869,7 +2865,7 @@
           company: {
             type: "general",
             subject: "How about PIPE WORLD (PTY) LTD?",
-            image: "assets/qualification-01.jpg",
+            image: "assets/delivery-pipeworld-truck.jpg",
             en: {
               title: "How about PIPE WORLD (PTY) LTD?",
               description: "The company profile states that PIPE WORLD (PTY) LTD was established in Botswana in 2019 and offers customer service from pre-sales consultation to technical support.",
