@@ -2,6 +2,7 @@
 
 This project includes:
 - the static homepage in `index.html`
+- dedicated Botswana landing pages for HDPE pressure pipe, U-PVC pressure pipe and electrical conduit
 - a real inquiry API at `/api/contact`
 - an admin dashboard at `/admin.html` for enquiries and bilingual cooperation cases
 - local fallback storage for submissions when Supabase is not configured
@@ -28,6 +29,29 @@ This project includes:
 
 Deploy to Vercel and add the same environment variables in Project Settings > Environment Variables.
 The local development server does not need a Vercel login. Vercel automatically uses the files under `api/` when deployed.
+
+## Search indexing and social previews
+
+The public pages include canonical URLs, Open Graph/Twitter share metadata, product and breadcrumb structured data,
+and visible FAQs with matching FAQ structured data. `sitemap.xml` lists the homepage, product pages and FAQ page;
+`robots.txt` points crawlers to the sitemap and excludes the admin page and API routes. Factory gallery image filenames
+are already descriptive English names, and the gallery creates a descriptive `alt` value from each filename.
+
+To enable Google Search Console reporting, a site owner needs to:
+
+1. Sign in to [Google Search Console](https://search.google.com/search-console/) with the Google account that should
+   own the property.
+2. Add `https://www.pipeworld-bw.com/` as a URL-prefix property and complete Google's ownership verification. DNS
+   verification is also available if you prefer to verify the whole domain.
+3. After the production deployment is live, open **Sitemaps** for the property and submit
+   `https://www.pipeworld-bw.com/sitemap.xml`.
+4. Use **URL inspection** to request indexing for the homepage, three product pages and FAQ page. Search Console
+   reporting begins after Google crawls the site; indexing and appearance of rich results are not guaranteed.
+
+FAQ structured data must match visible answers. Google currently limits FAQ rich-result display, so adding this markup
+does not guarantee expanded search listings. Product structured data deliberately omits price and offers because
+products are quotation-based; this may not qualify the pages for Google's product rich results, which can require
+pricing or other offer details.
 
 ## Supabase table
 
